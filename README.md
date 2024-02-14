@@ -1,0 +1,1 @@
+Health With Friends is a health and fitness web application designed to help improve fitness of its users and reduce social isolation through the inclusion of friends and competition. The system was developed within the Django framework and has met all its functional and non-functional requirements.
