@@ -1,0 +1,91 @@
+{% extends 'healthwithfriends/base.html' %}
+{% block content %}
+    <div id="app">
+        <div class="container">
+            <div class="contentContainer">
+                {% csrf_token %}
+                <div v-for="u in users">
+                    <div class="row">
+                        <div class="col-sm">
+                            <h4 style="text-align: right">[[ u.username ]]</h4>
+                        </div>
+                        <div class="col-sm" id="u.id" style="text-align: left">
+                            <div v-if="u.is_active">
+                                <button type="button" class="btn btn-danger" v-bind:id="u.id+'disable'" @click="updateStatus(u.id, 'disable')" style="margin-bottom: 0.5em">Disable</button>
+                                <button type="button" class="btn btn-success" v-bind:id="u.id+'enable'" @click="updateStatus(u.id, 'enable')" style="margin-bottom: 0.5em" hidden>Activate</button>
+                            </div>
+                            <div v-else>
+                                <button type="button" class="btn btn-danger" v-bind:id="u.id+'disable'" @click="updateStatus(u.id, 'disable')" style="margin-bottom: 0.5em" hidden>Disable</button>
+                                <button type="button" class="btn btn-success" v-bind:id="u.id+'enable'" @click="updateStatus(u.id, 'enable')" style="margin-bottom: 0.5em">Activate</button>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    {% block scripts %}
+        <script>
+            let myApp = Vue.createApp({
+                delimiters: ["[[", "]]"],
+                data() {
+                    return {
+                        user: [],
+                        users: [],
+                    }
+                },
+                async created() {
+                    let user = await fetch("{% url 'user api' %}");
+                    if (user.ok) {
+                        let data = await user.json();
+                        this.user = data.user;
+                        console.log(this.user);
+                    } else {
+                        alert("failed to load user");
+                    }
+
+                    let users = await fetch("{% url 'users api' %}");
+                    if (users.ok) {
+                        let data = await users.json();
+                        this.users = data.users;
+                        console.log(this.users);
+                    } else {
+                        alert("failed to load users");
+                    }
+                },
+
+                methods: {
+                    async updateStatus(id, status){
+                        let response = await fetch(this.user[0].api, {
+                            method: 'PUT_STATUS', // Method itself
+                            body: JSON.stringify({'id': id,
+                                'status': status,
+                            }), // We send data in JSON format
+                            headers: {
+                                "Content-Type": "application/json",
+                                "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value,
+                            },
+                        });
+                        if(response.ok){
+                            alert("User status updated.")
+                            if (status === "disable"){
+                                document.getElementById(id+"disable").hidden = true;
+                                document.getElementById(id+"enable").hidden = false;
+                            }
+                            else{
+                                document.getElementById(id+"disable").hidden = false;
+                                document.getElementById(id+"enable").hidden = true;
+                            }
+                        }
+                        else{
+                            alert("STATUS NOT Updated");
+                        }
+                    }
+                },
+            });
+            myApp.mount('#app');
+        </script>
+    {% endblock %}
+{% endblock %}

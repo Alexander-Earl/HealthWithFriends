@@ -1,0 +1,76 @@
+{% extends 'healthwithfriends/base.html' %}
+{% block content %}
+    <div id="app">
+        {% csrf_token %}
+        <div class="container">
+            <div class="contentContainer">
+                {% for m in messages %}
+                    {% if m.sender == request.user %}
+                        <div style="background-color: #2b76ff; width:30%; margin-left: 35em; border-radius: 15px;">
+                            <p><b>You:</b> {{ m.body }} <br><i>{{ m.date }}</i></p>
+                        </div>
+                    {% else %}
+                        <div style="background-color: lightslategrey; width:30%; margin-left: 25em; border-radius: 15px;">
+                            <p><b>{{ m.sender }}:</b> {{ m.body }} <br><i>{{ m.date }}</i></p>
+                        </div>
+                    {% endif %}
+
+                {% endfor %}
+                <textarea id="body" name="w3review" rows="4" cols="50"></textarea>
+                <br>
+                <button type="button" class="btn btn-success" @click="send_message({{ id }})"><b><i>Send</i></b></button>
+            </div>
+        </div>
+    </div>
+    {% block scripts %}
+        <script>
+            let myApp = Vue.createApp({
+                delimiters: ["[[", "]]"],
+                data() {
+                    return {
+                        user: [],
+                    }
+                },
+                async created(){
+                    let response = await fetch("{% url 'user api' %}");
+                    if (response.ok) {
+                        let data = await response.json();
+                        this.user = data.user;
+                        console.log(this.user);
+                    } else {
+                        alert("failed to load user");
+                    }
+                },
+                methods: {
+                    async send_message(id){
+                        if (document.getElementById("body").value.length == 0){
+                            alert("Message body is empty.");
+                        }
+                        else{
+                            let response = await fetch(this.user[0].api, {
+                                method: 'POST_MESSAGE', // Method itself
+                                body: JSON.stringify({
+                                    body: document.getElementById("body").value,
+                                    recipient: id
+                                }), // We send data in JSON format
+                                headers: {
+                                    "Content-Type": "application/json",
+                                    "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value,
+                                    "Access-Control-Allow-Origin" : "*",
+                                    "Access-Control-Allow-Credentials" : true
+                                },
+                            });
+                            if(response.ok){
+                                location.reload();
+                            }
+                            else{
+                                alert("Failed to send message");
+                            }
+                        }
+                    }
+                }
+            });
+            myApp.mount('#app');
+        </script>
+    {% endblock %}
+{% endblock %}

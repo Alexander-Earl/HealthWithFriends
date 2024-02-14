@@ -1,0 +1,215 @@
+{% extends 'healthwithfriends/base.html' %}
+{% block content %}
+    <div id="app">
+        {% csrf_token %}
+        <div class="container">
+            <div class="contentContainerPrivacy">
+                <table class="table">
+                    <tbody v-for="u in user">
+                    <tr>
+                        <th scope="row">Profile Picture:</th>
+                        <td id="private">
+                            <a>Private</a>
+                        </td>
+                        <td>
+                            <div class="form-check form-switch">
+                                <input v-if="u.preferences['profile_picture']" class="form-check-input" type="checkbox" id="profile_picture" @click='updatePreference(u)'  checked>
+                                <input v-else class="form-check-input" type="checkbox" id="profile_picture" @click='updatePreference(u)'public>
+                                <label class="form-check-label" for="profile_picture">Public</label>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">First Name:</th>
+                        <td id="private">
+                            <a>Private</a>
+                        </td>
+                        <td>
+                            <div class="form-check form-switch">
+                                <input v-if="u.preferences['first_name']" class="form-check-input" type="checkbox" id="first_name" @click='updatePreference(u)'  checked>
+                                <input v-else class="form-check-input" type="checkbox" id="first_name" @click='updatePreference(u)'>
+                                <label class="form-check-label" for="first_name">Public</label>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Last Name:</th>
+                        <td id="private">
+                            <a>Private</a>
+                        </td>
+                        <td>
+                            <div class="form-check form-switch">
+                                <input v-if="u.preferences['last_name']" class="form-check-input" type="checkbox" id="last_name" @click='updatePreference(u)' checked>
+                                <input v-else class="form-check-input" type="checkbox" id="last_name" @click='updatePreference(u)'>
+                                <label class="form-check-label" for="last_name">Public</label>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Sex:</th>
+                        <td id="private">
+                            <a>Private</a>
+                        </td>
+                        <td>
+                            <div class="form-check form-switch">
+                                <input v-if="u.preferences['sex']" class="form-check-input" type="checkbox" id="sex" @click='updatePreference(u)'  checked>
+                                <input v-else class="form-check-input" type="checkbox" id="sex" @click='updatePreference(u)'>
+                                <label class="form-check-label" for="sex">Public</label>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Age:</th>
+                        <td id="private">
+                            <a>Private</a>
+                        </td>
+                        <td>
+                            <div class="form-check form-switch">
+                                <input v-if="u.preferences['age']" class="form-check-input" type="checkbox" id="age" @click='updatePreference(u)' checked>
+                                <input v-else class="form-check-input" type="checkbox" id="age" @click='updatePreference(u)'>
+                                <label class="form-check-label" for="age">Public</label>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Height:</th>
+                        <td id="private">
+                            <a>Private</a>
+                        </td>
+                        <td>
+                            <div class="form-check form-switch">
+                                <input v-if="u.preferences['height']" class="form-check-input" type="checkbox" id="height" @click='updatePreference(u)' checked>
+                                <input v-else class="form-check-input" type="checkbox" id="height" @click='updatePreference(u)'>
+                                <label class="form-check-label" for="height">Public</label>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Weight:</th>
+                        <td id="private">
+                            <a>Private</a>
+                        </td>
+                        <td>
+                            <div class="form-check form-switch">
+                                <input v-if="u.preferences['weight']" class="form-check-input" type="checkbox" id="weight" @click='updatePreference(u)' checked>
+                                <input v-else class="form-check-input" type="checkbox" id="weight" @click='updatePreference(u)'>
+                                <label class="form-check-label" for="weight">Public</label>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">BMI:</th>
+                        <td id="private">
+                            <a>Private</a>
+                        </td>
+                        <td>
+                            <div class="form-check form-switch">
+                                <input v-if="u.preferences['bmi']" class="form-check-input" type="checkbox" id="bmi" @click='updatePreference(u)' checked>
+                                <input v-else class="form-check-input" type="checkbox" id="bmi" @click='updatePreference(u)'>
+                                <label class="form-check-label" for="bmi">Public</label>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Avg. Calorific Intake:</th>
+                        <td id="private">
+                            <a>Private</a>
+                        </td>
+                        <td>
+                            <div class="form-check form-switch">
+                                <input v-if="u.preferences['avg_calorific_intake']" class="form-check-input" type="checkbox" id="avgCalorificIntake" @click='updatePreference(u)' checked>
+                                <input v-else class="form-check-input" type="checkbox" id="avgCalorificIntake" @click='updatePreference(u)'>
+                                <label class="form-check-label" for="avgCalorificIntake">Public</label>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Leaderboard</th>
+                        <td id="private">
+                            <a>Private</a>
+                        </td>
+                        <td>
+                            <div class="form-check form-switch">
+                                <input v-if="u.preferences['leaderboard']" class="form-check-input" type="checkbox" id="leaderboard" @click='updatePreference(u)' checked>
+                                <input v-else class="form-check-input" type="checkbox" id="leaderboard" @click='updatePreference(u)'>
+                                <label class="form-check-label" for="leaderboard">Public</label>
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <style>
+        th{
+            text-align: right;
+            width: 47%;
+        }
+        tr{
+            color: white;
+        }
+        #private{
+            width: 0;
+            text-align: right;
+        }
+    </style>
+    {% block scripts %}
+        <script>
+            let myApp = Vue.createApp({
+                delimiters: ["[[", "]]"],
+                data() {
+                    return {
+                        user: [],
+                    }
+                },
+                async created(){
+                    let response = await fetch("{% url 'user api' %}");
+                    if (response.ok) {
+                        let data = await response.json();
+                        this.user = data.user;
+                    } else {
+                        alert("failed to load user");
+                    }
+                },
+                methods: {
+                    async updatePreference(user){
+                        let response = await fetch(user.update_preferences_api, {
+                            method: 'PUT', // Method itself
+                            body: JSON.stringify({
+                                profile_picture: (Number(document.getElementById("profile_picture").checked)),
+                                first_name: (Number(document.getElementById("first_name").checked)),
+                                last_name: (Number(document.getElementById("last_name").checked)),
+                                age: (Number(document.getElementById("age").checked)),
+                                height: (Number(document.getElementById("height").checked)),
+                                weight: (Number(document.getElementById("weight").checked)),
+                                bmi: (Number(document.getElementById("bmi").checked)),
+                                sex: (Number(document.getElementById("sex").checked)),
+                                avg_calorific_intake: (Number(document.getElementById("avgCalorificIntake").checked)),
+                                leaderboard: (Number(document.getElementById("leaderboard").checked))
+                            }), // We send data in JSON format
+                            headers: {
+                                "Content-Type": "application/json",
+                                "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value,
+                            },
+                        });
+                        if(response.ok){
+                            let response2 = await fetch("{% url 'user api' %}")
+                            if(response2.ok){
+                                let data2 = await response2.json();
+                                this.user = data2.user;
+                            }
+                            else{
+                                alert("failed to load list of users");
+                            }
+                        }
+                        else{
+                            alert("failed to update user");
+                        }
+                    },
+                }
+            })
+            myApp.mount('#app')
+        </script>
+    {% endblock %}
+{% endblock %}

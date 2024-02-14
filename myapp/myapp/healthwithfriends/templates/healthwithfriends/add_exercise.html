@@ -1,0 +1,174 @@
+{% extends 'healthwithfriends/base.html' %}
+{% block content %}
+    <div id="app">
+        <div class="container">
+            <div class="contentContainer" v-for="u in user">
+                {% csrf_token %}
+                <p><i>The personal information below is used to accurately calculate the calorific results from your entered activities.</i></p>
+
+                <h4 id="age">Age: <b>{{ user.calculate_age }}</b></h4>
+                <h4>Height:<b>[[ u.height ]]cm</b></h4>
+                <h4>Weight: <b>[[ u.weight ]]kg</b></h4>
+                <h4>
+                    Sex:
+                    {% if user.sex %}
+                        <b>Male
+                            {% else %}
+                            Female</b>
+                    {% endif %}
+                </h4>
+            </div>
+            <div class="contentContainer">
+                <table class="table" style="color: white; width: auto; margin: auto;">
+                    <tr>
+                        <th scope="row"><h5>Activity:</h5></th>
+                        <td><input type="text" class="form-control" id="exercise"></td>
+                    </tr>
+                    <tr>
+                        <th scope="row"><h5>Duration (mins):</h5></th>
+                        <td><input type="number" min="1" class="form-control" id="duration"></td>
+                    </tr>
+                    <tr>
+                        <th scope="row"><h5>Total Calories Burned:</h5></th>
+                        <td style="background-color: green"><h5>[[ calories_burned ]] kcal</h5></td>
+                    </tr>
+                </table>
+                <br>
+                <button @click="getExercise()" id="calculate_button" class="btn btn-primary">Calculate Calories Burned</button>
+                <br><br>
+                <div v-for="u in user">
+                    <span><button type="button" class="btn btn-danger" id="reset" @click="reset()"
+                                  style="margin-right: 0.5em" hidden>Reset</button>
+                    </span>
+                    <button @click="submitExercise(u)" class="btn btn-success" id="submit" hidden>Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <style>
+
+    </style>
+    {% block scripts %}
+        <script>
+            let myApp = Vue.createApp({
+                delimiters: ["[[", "]]"],
+                data() {
+                    return {
+                        user: [],
+                        calories_burned: 0,
+                    }
+                },
+                async created() {
+                    let response = await fetch("{% url 'user api' %}");
+                    if (response.ok) {
+                        let data = await response.json();
+                        this.user = data.user;
+                    } else {
+                        alert("failed to load user");
+                    }
+                },
+
+                methods: {
+                    async getExercise() {
+                        let exercise = document.getElementById("exercise");
+                        let duration = document.getElementById("duration");
+
+                        let calculate_button = document.getElementById("calculate_button");
+                        let submit = document.getElementById("submit");
+                        let reset  = document.getElementById("reset");
+
+                        exercise.disabled = true;
+                        duration.disabled = true;
+                        calculate_button.disabled = true;
+
+                        let response = await fetch('https://trackapi.nutritionix.com/v2/natural/exercise', {
+                            method: 'POST',
+                            headers: {
+                                'x-app-id': '01cc3d95',
+                                'x-app-key': '1ddebf0b8d609ec316b98d867291f39b',
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                "query": String(exercise.value +' '+ duration.value+'mins'),
+                                "gender": String(this.user[0].sex),
+                                "weight_kg": parseFloat(this.user[0].weight),
+                                "height_cm": parseFloat(this.user[0].height),
+                                "age": parseInt(document.getElementById("age").innerHTML.replace( /^\D+/g, '')),
+                            }),
+                        });
+                        if (response.ok) {
+                            let info = await response.json();
+                            console.log(info);
+                            if (info.exercises[0].user_input == "walking" && exercise.value != "walking"){
+                                if (confirm(exercise.value+" could not be found. \nIf you insist the activity was entered correctly select 'OK'." +
+                                    "\nIf you have entered a typo, select 'Cancel' and re-enter the activity.")){
+                                    let calories = prompt("Enter the calories burned based upon doing "+duration.value+"mins of activity.");
+                                    this.calories_burned = Math.abs(parseInt(calories));
+                                    submit.hidden = false;
+                                    reset.hidden = false;
+                                }
+                                else{
+                                    this.reset();
+                                }
+                            }
+                            else{
+                                this.calories_burned = Math.round(info.exercises[0].nf_calories);
+                                submit.hidden = false;
+                                reset.hidden = false;
+                            }
+                        } else {
+                            console.log("Error");
+                        }
+                    },
+
+                    reset(){
+                        let exercise = document.getElementById("exercise");
+                        exercise.value = "";
+                        exercise.disabled = false;
+
+                        let duration = document.getElementById("duration");
+                        duration.value = "";
+                        duration.disabled = false;
+
+                        document.getElementById("calculate_button").disabled = false;
+
+                        this.calories_burned = 0;
+
+                        document.getElementById("reset").hidden = true;
+                        document.getElementById("submit").hidden = true;
+                    },
+
+                    async submitExercise(u){
+                        let exercise_type = document.getElementById("exercise").value;
+                        exercise_type = exercise_type.charAt(0).toUpperCase() + exercise_type.slice(1)
+                        let duration_mins = document.getElementById("duration").value;
+                        let total_calories = this.calories_burned;
+
+                        let response = await fetch(u.api, {
+                            method: 'POST_EXERCISE', // Method itself
+                            body: JSON.stringify({
+                                exercise_type: exercise_type,
+                                duration_mins: parseInt(duration_mins),
+                                total_calories: parseFloat(total_calories)
+                            }), // We send data in JSON format
+                            headers: {
+                                "Content-Type": "application/json",
+                                "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value,
+                                "Access-Control-Allow-Origin" : "*",
+                                "Access-Control-Allow-Credentials" : true
+                            },
+                        });
+                        if(response.ok){
+                            alert("Activity Submitted.");
+                            location.reload();
+                        }
+                        else{
+                            alert("Failed to submit exercise.");
+                        }
+                    }
+                },
+            });
+            myApp.mount('#app');
+        </script>
+    {% endblock %}
+{% endblock %}

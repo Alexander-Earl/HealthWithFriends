@@ -1,0 +1,84 @@
+{% extends 'healthwithfriends/base.html' %}
+{% block content %}
+    <div id="app">
+        {% csrf_token %}
+        <div class="container">
+            <div class="contentContainer" style="background-color: white">
+                <div class="d-flex justify-content-center align-items-center h-100">
+                    <div class="d-flex justify-content-center w-20 m-2">
+                        <canvas id="line-chart" width="1000" height="650"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <p id="mon" hidden>{{ mon }}</p>
+                <p id="tue" hidden>{{ tue }}</p>
+                <p id="wed" hidden>{{ wed }}</p>
+                <p id="thu" hidden>{{ thu }}</p>
+                <p id="fri" hidden>{{ fri }}</p>
+                <p id="sat" hidden>{{ sat }}</p>
+                <p id="sun" hidden>{{ sun }}</p>
+            </div>
+        </div>
+    </div>
+    {% block scripts %}
+        <script>
+            let myApp = Vue.createApp({
+                delimiters: ["[[", "]]"],
+                data() {
+                    return {
+                        user: [],
+                        data_calories: [2000, 3000, 4000, 5000, 6000, 7000, 8000],
+                    }
+                },
+                async created(){
+                    let response = await fetch("{% url 'user api' %}");
+                    if (response.ok) {
+                        let data = await response.json();
+                        this.user = data.user;
+
+                    } else {
+                        alert("failed to load user");
+                    }
+                },
+                methods: {
+                    returnData(){
+
+                        return this.data_calories;
+                    },
+                }
+            })
+            myApp.mount('#app');
+            new Chart(document.getElementById("line-chart"), {
+                type: 'line',
+                data: {
+                    labels: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+                    datasets: [
+                        {
+                            data: [
+                                Math.trunc(parseInt(document.getElementById('mon').innerText)),
+                                Math.trunc(parseInt(document.getElementById('tue').innerText)),
+                                Math.trunc(parseInt(document.getElementById('wed').innerText)),
+                                Math.trunc(parseInt(document.getElementById('thu').innerText)),
+                                Math.trunc(parseInt(document.getElementById('fri').innerText)),
+                                Math.trunc(parseInt(document.getElementById('sat').innerText)),
+                                Math.trunc(parseInt(document.getElementById('sun').innerText))
+                            ],
+                            borderColor: "#3e95cd",
+                            label: "kcal",
+                            fill: false
+                        },
+                    ]
+                },
+                options: {
+                    title: {
+                        display: true,
+                    },
+                    legend: {
+                        display: false
+                    },
+                }
+            });
+        </script>
+    {% endblock %}
+{% endblock %}

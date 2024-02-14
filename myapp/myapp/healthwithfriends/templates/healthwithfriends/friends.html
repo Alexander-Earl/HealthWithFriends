@@ -1,0 +1,63 @@
+{% extends 'healthwithfriends/base.html' %}
+{% block content %}
+    <div id="app">
+        {% csrf_token %}
+        <div class="container">
+            <div class="contentContainer">
+                <h3>Requests:</h3>
+                {% for r in friend_requests %}
+                    <p><i><u><a href="{% url 'view public profile' r.from_user_id %}">{{ r.from_user }}</a></u></i>: <button type="button" class="btn btn-success"><a href="{% url 'accept' r.id %}"><b>Accept</b></a></button>
+                        <button type="button" class="btn btn-danger" style="margin-left: 0.5em"><a href="{% url 'reject' r.id %}"><b>Reject</b></a></button>
+                    </p>
+                {% endfor %}
+            </div>
+            <div class="contentContainer">
+                <h3>Friends:</h3>
+                {% for f in user.friends.all %}
+                    <p><i><u><a href="{% url 'view public profile' f.id %}">{{ f }}</a></u></i>: <button type="button" class="btn btn-secondary"><a href="{% url 'messages' f.id %}"><b>Message</b></a></button></p>
+                {% endfor %}
+            </div>
+            <div class="contentContainer">
+                <h3>Other Users:</h3>
+                {% for u in other_users %}
+                    <p><i><u><a href="{% url 'view public profile' u.id %}">{{ u.username }}</a></u></i>: <button type="button" class="btn btn-primary"><a href="{% url 'add_friend' u.id %}"><b>Add Friend</b></a></button></p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% block scripts %}
+        <script>
+            let myApp = Vue.createApp({
+                delimiters: ["[[", "]]"],
+                data() {
+                    return {
+                        user: [],
+                        other_users: [],
+                        friend_requests: [],
+                        found_user: []
+                    }
+                },
+                async created(){
+                    let response = await fetch("{% url 'user api' %}");
+                    if (response.ok) {
+                        let data = await response.json();
+                        this.user = data.user;
+                        this.friend_requests = data.friend_requests;
+                        this.other_users = data.other_users;
+                    } else {
+                        alert("failed to load user");
+                    }
+                },
+                methods: {},
+            });
+            myApp.mount('#app')
+        </script>
+    {% endblock %}
+    <style>
+        a, a:hover{
+            text-decoration: none;
+            color: white;
+        }
+
+    </style>
+{% endblock %}

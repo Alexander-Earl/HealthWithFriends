@@ -1,0 +1,80 @@
+{% extends 'healthwithfriends/base.html' %}
+{% block content %}
+    <div id="app">
+        <div class="container" v-for="u in user">
+            <div class="contentContainer" id="personal_info">
+                <h4 v-if="u.preferences['height_units']">Height: <b>[[ u.imperial_height_ft ]]ft [[ u.imperial_height_in ]]in</b></h4>
+                <h4 v-else>Height: <b>[[ u.height ]]cm</b></h4>
+
+                <h4 v-if="u.preferences['weight_units']">Weight: <b>[[ u.imperial_weight_st ]]st [[ u.imperial_weight_lbs ]]lbs</b></h4>
+
+                <h4 v-else>Weight: <b>[[ u.weight ]]kg</b></h4>
+
+                <h4>BMI: <b>[[ u.bmi ]]</b></h4>
+            </div>
+            <div class="contentContainer" id="calories">
+                <h4>Daily Calories Burned: <b>[[ u.daily_burned ]] kcal</b></h4>
+                <h4>Daily Calories Consumed: <b>[[ u.daily_intake ]] kcal</b></h4>
+            </div>
+            <div class="contentContainer" id="recommended">
+                <h3>Recommended Calorific Intake: {{ user.recommended_intake }} kcal</h3>
+                 <h6><i>* calculated on the assumption of little daily exercise. *</i></h6>
+            </div>
+        </div>
+    </div>
+    {% block scripts %}
+        <script>
+            let myApp = Vue.createApp({
+                delimiters: ["[[", "]]"],
+                data() {
+                    return {
+                        user: [],
+                    }
+                },
+                async created(){
+                    let response = await fetch("{% url 'user api' %}");
+                    if (response.ok) {
+                        let data = await response.json();
+                        this.user = data.user;
+
+                    } else {
+                        alert("failed to load user");
+                    }
+                },
+                methods: {
+                    async updateUser(u) {
+                        let response = await fetch(u.api, {
+                            method: 'PUT', // Method itself
+                            body: JSON.stringify({
+                                dob: u.dob,
+                                city: u.city,
+                                height: u.height,
+                                weight: u.weight,
+                            }), // We send data in JSON format
+                            headers: {
+                                "Content-Type": "application/json",
+                                "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value,
+                            },
+                        });
+                        if(response.ok){
+                            u.editing = false;
+                            let response2 = await fetch("{% url 'user api' %}")
+                            if(response2.ok){
+                                let data2 = await response2.json();
+                                this.user = data2.user;
+                            }
+                            else{
+                                alert("failed to load list of users");
+                            }
+                        }
+                        else{
+                            alert("failed to update user");
+                        }
+                    },
+
+                }
+            })
+            myApp.mount('#app')
+        </script>
+    {% endblock %}
+{% endblock %}

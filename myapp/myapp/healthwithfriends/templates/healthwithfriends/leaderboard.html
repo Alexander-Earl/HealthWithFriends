@@ -1,0 +1,58 @@
+{% extends 'healthwithfriends/base.html' %}
+{% block content %}
+    <div id="app">
+        {% csrf_token %}
+        <div class="container">
+            <div class="contentContainer" style="background-color: white">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th scope="col">Rank</th>
+                        <th scope="col">Username</th>
+                        <th scope="col">Calories Burned</th>
+                        <th scope="col">Member since</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="(user,k) in users">
+                        <th scope="row">[[ k+1 ]]</th>
+                        <td>[[ user.username ]]</td>
+                        <td>[[ user.total_calories_burned ]]</td>
+                        <td>[[ user.date_joined ]]</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% block scripts %}
+        <script>
+            let myApp = Vue.createApp({
+                delimiters: ["[[", "]]"],
+                data() {
+                    return {
+                        users: []
+                    }
+                },
+                async created(){
+                    let response = await fetch("{% url 'all users' %}");
+                    if (response.ok) {
+                        let data = await response.json();
+                        this.users = data.users;
+                        console.log(this.users);
+                    } else {
+                        alert("failed to load user");
+                    }
+                    this.sortArray(this.users);
+                },
+                methods: {
+                    sortArray(users){
+                        return this.users.sort((a, b) => b.total_calories_burned - a.total_calories_burned);
+                    }
+                },
+            })
+            myApp.mount('#app')
+
+        </script>
+    {% endblock %}
+{% endblock %}

@@ -1,0 +1,225 @@
+{% extends 'healthwithfriends/base.html' %}
+{% block content %}
+    <div id="app">
+        <div class="container">
+            <div class="contentContainer">
+                {% csrf_token %}
+                <div class="col-9" v-for = "u in user" style="margin-left: auto; margin-right: auto;">
+                    <div class="mt-3" id="profile_picture">
+                        <img  class ="profile_pic" id="profile_pic" src = "{{request.user.profile_pic.url}}" height = "200" width = "200">
+                        <br>
+                        <input type="file" id="profile_pic_upload" @change="profilePicUpload()" accept="image/png, image/jpeg">
+                    </div>
+                    <table class="table table-light table-striped table-bordered border-dark table-hover table-sm">
+                        <thead>
+                        <tr>
+                            <th scope ="col" colspan="2" class = "col text-center" >User Details</th>
+                        </tr>
+                        </thead>
+                        <tbody class="col text-center">
+                        <tr>
+                            <th scope="row" class="w-50" class="w-50">First Name</th>
+                            <td>
+                                <input v-if="u.editing" type="text" step="1" v-model="u.first_name">
+                                <a v-else >[[ u.first_name ]]</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="w-50">Last Name</th>
+                            <td>
+                                <input v-if="u.editing" type="text" step="1" v-model="u.last_name">
+                                <a v-else >[[ u.last_name ]]</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="w-50">Sex</th>
+                            <td>
+                                <select v-if="u.editing" v-model="u.sex">
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                </select>
+                                <a v-else >
+                                    [[ u.sex ]]
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="w-50">Email</th>
+                            <td>
+                                <input v-if="u.editing" type="email" step="1" v-model="u.email">
+                                <a v-else >[[ u.email ]]</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="w-50">Date of Birth</th>
+                            <td>
+                                <input v-if="u.editing" type="date" step="1" v-model="u.dob">
+                                <a v-else >[[ u.dob ]]</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="w-50">City</th>
+                            <td>
+                                <input v-if="u.editing" type="text" v-model="u.city">
+                                <a v-else >[[ u.city ]]</a>
+                            </td>
+                        </tr>
+                        <tr v-if="u.preferences.height_units">
+                            <th scope="row" class="w-50">Height (ft & in)</th>
+                            <td>
+                                <div v-if="u.editing">
+                                    <label for="ft">Ft: </label>
+                                    <input name="ft" type="text" v-model="u.imperial_height_ft">
+                                    <br>
+                                    <label for="in" style="padding-top: 0.5em">In: </label>
+                                    <input name="in" type="text" v-model="u.imperial_height_in">
+                                </div>
+                                <a v-else >[[ u.imperial_height_ft ]]ft [[ u.imperial_height_in ]]in</a>
+                            </td>
+                        </tr>
+                        <tr v-else>
+                            <th scope="row" class="w-50">Height (cm)</th>
+                            <td>
+                                <input v-if="u.editing" type="text" v-model="u.height">
+                                <a v-else >[[ u.height ]]</a>
+                            </td>
+                        </tr>
+                        <tr v-if="u.preferences.weight_units">
+                            <th scope="row" class="w-50">Weight (st & lbs)</th>
+                            <td>
+                                <div v-if="u.editing">
+                                    <label for="st">St: </label>
+                                    <input name="st" type="text" v-model="u.imperial_weight_st">
+                                    <br>
+                                    <label for="lbs" style="padding-top: 0.5em">Lbs: </label>
+                                    <input name="lbs" type="text" v-model="u.imperial_weight_lbs">
+                                </div>
+                                <a v-else >[[ u.imperial_weight_st ]]st [[ u.imperial_weight_lbs ]]lbs</a>
+                            </td>
+                        </tr>
+                        <tr v-else>
+                            <th scope="row" class="w-50">Weight (kg)</th>
+                            <td>
+                                <input v-if="u.editing" type="text" v-model="u.weight">
+                                <a v-else >[[ u.weight ]]</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" class = "col text-center">
+                                <button v-if="!u.editing" @click="u.editing = true" class="btn btn-primary">Edit</button>
+                                <button v-else @click="updateUser(u)" class="btn btn-sm btn-success">Save</button>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                    <h4 id="bmi">BMI: [[ u.bmi ]]</h4>
+                    <a class="btn btn-info" href="{% url 'privacy' %}" style="margin-right: 0.75em; color: white;">Privacy Settings</a>
+                    <a class="btn btn-info" v-for="u in user" :href="u.public_profile" style="color: white">View Public Profile</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <style>
+        #bmi, #profile_picture {
+            text-align: center;
+        }
+        #profile_pic_upload{
+            margin: 0.5em;
+        }
+
+    </style>
+    {% block scripts %}
+        <script>
+            let myApp = Vue.createApp({
+                delimiters: ["[[", "]]"],
+                data() {
+                    return {
+                        user: [],
+
+                        file: null,
+                        selected_picture: false,
+                    }
+                },
+                async created(){
+                    let response = await fetch("{% url 'user api' %}");
+                    if (response.ok) {
+                        let data = await response.json();
+                        this.user = data.user;
+                        console.log(this.user);
+
+                    } else {
+                        alert("failed to load user");
+                    }
+                },
+                methods: {
+                    profilePicUpload(){
+                        let profile_pic_upload = document.getElementById("profile_pic_upload");
+                        this.selected_picture = false;
+                        if (profile_pic_upload.value != ""){
+                            this.selected_picture = true;
+                            this.enableProfilePicSubmission();
+                        }
+                    },
+                    async enableProfilePicSubmission(){
+                        let formData = new FormData();
+                        formData.append('profile_pic', document.getElementById("profile_pic_upload").files[0]);
+                        let response = await fetch("{% url 'update_profile_pic' %}", {
+                            method: 'POST', // Method itself
+                            headers: {
+                                "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value,
+                            },
+                            body: formData
+                        });
+                        if (response.ok) {
+                            let updated_pic = await response.json();
+                            this.user[0].profile_pic = updated_pic.profile_pic;
+                            document.getElementById('profile_pic').src = updated_pic.profile_pic;
+                            alert("Profile picture updated.")
+                        }
+                        else{
+                            alert("Profile picture not updated.")
+                        }
+                    },
+                    async updateUser(u) {
+                        let response = await fetch(u.api, {
+                            method: 'PUT', // Method itself
+                            body: JSON.stringify({
+                                first_name: u.first_name,
+                                last_name: u.last_name,
+                                sex: u.sex,
+                                dob: u.dob,
+                                city: u.city,
+                                height: u.height,
+                                weight: u.weight,
+                                imperial_height_ft: u.imperial_height_ft,
+                                imperial_height_in: u.imperial_height_in,
+                                imperial_weight_st: u.imperial_weight_st,
+                                imperial_weight_lbs: u.imperial_weight_lbs,
+                            }), // We send data in JSON format
+                            headers: {
+                                "Content-Type": "application/json",
+                                "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value,
+                            },
+                        });
+                        if(response.ok){
+                            u.editing = false;
+                            let response2 = await fetch("{% url 'user api' %}")
+                            if(response2.ok){
+                                let data2 = await response2.json();
+                                this.user = data2.user;
+                            }
+                            else{
+                                alert("failed to load list of users");
+                            }
+                        }
+                        else{
+                            alert("failed to update user");
+                        }
+                    },
+
+                }
+            })
+            myApp.mount('#app')
+        </script>
+    {% endblock %}
+{% endblock %}

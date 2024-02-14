@@ -1,0 +1,51 @@
+{% extends 'healthwithfriends/base.html' %}
+{% block content %}
+    <div id="app">
+        <!-- {% csrf_token %} -->
+        <div class="container" v-for="u in user">
+            <div class="contentContainer">
+                <h4>Change Password.</h4>
+                <div class="d-flex justify-content-center align-items-center text-left h-100">
+                    <div class="w-20 m-2">
+                        <label for="password">Current Password: </label>
+                        <input type="password" class="form-control" id="password">
+
+                        <label class="mt-2" for="password">New Password: </label>
+                        <input type="password" class="form-control" id="password">
+
+                        <label class="mt-2" for="confirm_password">Confirm New Password: </label>
+                        <input type="password" class="form-control" id="confirm_password">
+
+                        <button @click="updateUser(u)" class="btn btn-primary mt-3">Save changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block scripts %}
+    <script>
+        let myApp = Vue.createApp({
+            delimiters: ["[[", "]]"],
+            data() {
+                return {
+                    user: [],
+                }
+            },
+            async created(){
+                let response = await fetch("{% url 'user api' %}");
+                if (response.ok) {
+                    let data = await response.json();
+                    this.user = data.user;
+                    console.log(data.user[0]);
+                } else {
+                    alert("failed to load user");
+                }
+            },
+
+            methods: {
+            }
+        })
+        myApp.mount('#app')
+    </script>
+{% endblock %}

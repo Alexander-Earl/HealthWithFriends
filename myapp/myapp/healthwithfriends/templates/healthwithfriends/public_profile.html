@@ -1,0 +1,87 @@
+{% extends 'healthwithfriends/base.html' %}
+{% block content %}
+    <div id="app">
+        <div class="container">
+            <div class="contentContainer">
+                <div v-for="u in user" id="profile_info">
+                    {% if user.preferences.profile_picture %}
+                        <img class ="profile_pic" id="profile_pic" src = "{{ user.profile_pic.url }}" height = "200" width = "200">
+                    {% else %}
+                        <img class ="profile_pic" id="profile_pic" src = "/static/images/default.jpg" height = "200" width = "200">
+                    {% endif %}
+
+                    {% if user.preferences.first_name and user.preferences.last_name %}
+                        <h5>Name: {{ user.first_name }} {{ user.last_name }}</h5>
+                    {% elif user.preferences.first_name %}
+                        <h5>Name: {{ user.first_name }}</h5>
+                    {% endif %}
+
+                    {% if user.preferences.sex %}
+                        <h5>Sex: {{ user.sex }}</h5>
+                    {% endif %}
+
+                    {% if user.preferences.age %}
+                        <h5>Age: {{ user.calculate_age }}</h5>
+                    {% endif %}
+
+
+                    {% if user.preferences.height %}
+                        {% if user.preferences.height_units %}
+                            <h5>Height: {{ user.imperial_height_ft }}ft {{ user.imperial_height_in }}in</h5>
+                        {% else %}
+                            <h5>Height: {{ user.height }}cm</h5>
+                        {% endif %}
+                    {% endif %}
+
+                    {% if user.preferences.weight %}
+                        {% if user.preferences.weight_units %}
+                            <h5>Weight: {{ user.imperial_weight_st }}st {{ user.imperial_weight_lbs }}lbs</h5>
+                        {% else %}
+                            <h5>Weight: {{ user.weight }}kg</h5>
+                        {% endif %}
+                    {% endif %}
+
+                    {% if user.preferences.bmi %}
+                        <h5>BMI: {{ user.bmi }}</h5>
+                    {% endif %}
+
+                    {% if user.preferences.avg_calorific_intake %}
+                        <h5>Avg. Calorific Intake: {{ user.avg_calorific_intake }} kcals</h5>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% block scripts %}
+        <script>
+            let myApp = Vue.createApp({
+                delimiters: ["[[", "]]"],
+                data() {
+                    return {
+                        user: [],
+                    }
+                },
+                async created(){
+                    let response = await fetch("{% url 'user api' %}");
+                    if (response.ok) {
+                        let data = await response.json();
+                        this.user = data.user;
+                        console.log(this.user);
+                    } else {
+                        alert("failed to load user");
+                    }
+                },
+
+                methods: {
+
+                }
+            })
+            myApp.mount('#app')
+        </script>
+        <style>
+            #profile_info{
+                text-align: center;
+            }
+        </style>
+    {% endblock %}
+{% endblock %}

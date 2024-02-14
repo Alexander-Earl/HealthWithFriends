@@ -1,0 +1,42 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-light p-0">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav" style="height: 4rem;">
+            <li class="nav-item">
+                <a class="nav-link p-3" href="{% url 'signed in' %}">Home</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link p-3" href="{% url 'add meal' %}">Add Meal</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link p-3" href="{% url 'add exercise' %}">Add Exercise</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link p-3" href="{% url 'view private profile' %}">View Private Profile</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link p-3" href="{% url 'exercise log' %}">Exercise Log</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link p-3" href="{% url 'leaderboard' %}">View Leaderboard</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link p-3" href="{% url 'view food log' %}">Food Log</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link p-3" href="{% url 'view friends' %}">Friends</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link p-3" href="{% url 'settings' %}">Settings</a>
+            </li>
+            {% if request.user.is_admin %}
+                <li class="nav-item">
+                    <a class="nav-link p-3" href="{% url 'admin' %}"><i>View All Users</i></a>
+                </li>
+            {% endif %}
+        </ul>
+    </div>
+    <a class="nav-item nav-link p-3" style="height: 4rem; color: black" href="{% url 'logout' %}">Logout</a>
+</nav>

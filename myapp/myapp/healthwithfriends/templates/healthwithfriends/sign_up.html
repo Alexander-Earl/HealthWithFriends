@@ -1,0 +1,174 @@
+{% extends 'healthwithfriends/base.html' %}
+{% load widget_tweaks %}
+{% block content %}
+    <div id="app">
+        <div class="container">
+            <div class="row d-flex justify-content-center align-items-center h-65">
+                <div class="register-card-container" style="padding: 4em 0em 4em 1em">
+                    <div class="card custom-card text-white">
+                        <div class="card-body p-5">
+                            <div class="d-flex justify-content-center">
+                                <h3><a href="{% url 'login_page' %}" style='color: white; text-decoration: none;'>Health With Friends</a></h3>
+                            </div>
+                            <div class="d-flex justify-content-center mt-4" style="margin-left: 20%; margin-right: 20%">
+                                <form method="POST" id="registration-form">
+                                    {% csrf_token %}
+                                    {% if form.errors %}
+                                        {% for field in form %}
+                                            {% for error in field.errors %}
+                                                <div class="alert alert-danger">
+                                                    <b>{{ error|escape }}</b>
+                                                </div>
+                                            {% endfor %}
+                                        {% endfor %}
+                                    {% endif %}
+                                    <div class="input-group mb-3">
+                                        <span class="input-group-text"><i class="fas fa-user-tag"></i></span>
+                                        {% render_field form.username type="text" id="username" class="form-control input_user" placeholder="Username" %}
+                                    </div>
+                                    <div class="input-group mb-3">
+                                        <span class="input-group-text"><i class="fas fa-key"></i></span>
+                                        {% render_field form.password type="password" class="form-control input_pass" placeholder="Password" %}
+                                    </div>
+                                    <div class="input-group mb-3">
+                                        <span class="input-group-text"><i class="fas fa-file-signature"></i></span>
+                                        {% render_field form.first_name type="text" class="form-control" placeholder="First Name" %}
+                                    </div>
+                                    <div class="input-group mb-3">
+                                        <span class="input-group-text"><i class="fas fa-file-signature"></i></span>
+                                        {% render_field form.last_name type="text" class="form-control" placeholder="Last Name" %}
+                                    </div>
+                                    <div class="input-group mb-3">
+                                        <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                        <div class="form-control">
+                                            {% render_field form.sex %}
+                                        </div>
+                                    </div>
+                                    <div class="input-group mb-3">
+                                        <span class="input-group-text"><i class="fas fa-at"></i></span>
+                                        {% render_field form.email type="email" class="form-control" value="" placeholder="Email" %}
+                                    </div>
+                                    <div class="input-group mb-3">
+                                        <span class="input-group-text"><i class="fas fa-city"></i></span>
+                                        {% render_field form.city type="text" class="form-control" value="" placeholder="City" %}
+                                    </div>
+                                    <div class="input-group mb-3">
+                                        <span class="input-group-text"><i class="fas fa-calendar"></i></span>
+                                        {% render_field form.dob type="date" class="form-control" value="" placeholder="Date of Birth" %}
+                                    </div>
+                                    <div class="input-group mb-3" id="height-div">
+                                        <span class="input-group-text"><i class="fas fa-ruler-vertical"></i></span>
+                                        {% render_field form.height type="number" min=0 id="height" class="form-control" value="" placeholder="Height (cm)" %}
+                                    </div>
+                                    <div class="input-group mb-3" id="weight-div">
+                                        <span class="input-group-text"><i class="fas fa-weight-hanging"></i></span>
+                                        {% render_field form.weight type="number" min=0 id="weight" class="form-control" value="" placeholder="Weight (kg)" %}
+                                    </div>
+
+                                    <div class="d-flex justify-content-center mt-4 login-btn-container">
+                                        <button type="submit" name="button" class="btn btn-primary login-btn" @click="submit()">Sign Up</button>
+                                    </div>
+                                    <br>
+                                    <div class="form-check form-switch">
+                                        <label style="padding-left: 0.2em">Imperial</label>
+                                        <input class="form-check-input" type="checkbox" id="height-switch" @click='imperialHeight()'>
+                                        <label class="form-check-label" for="height-switch"><b>Height:</b> Metric</label>
+                                    </div>
+                                    <br>
+                                    <div class="form-check form-switch">
+                                        <label style="padding-left: 0.2em">Imperial</label>
+                                        <input class="form-check-input" type="checkbox" id="weight-switch" @click='imperialWeight()'>
+                                        <label for="weight-switch"><b>Weight:</b> Metric</label>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% block scripts %}
+        <script>
+            let myApp = Vue.createApp({
+                delimiters: ["[[", "]]"],
+                data() {
+                    return {
+                        user: [],
+                    }
+                },
+                methods: {
+                    reset(unit_id, imperial_id){
+                        document.getElementById(imperial_id).remove();
+                        if (unit_id.id === "height"){
+                            unit_id.placeholder = "Height (cm)"
+                        }
+                        else{
+                            unit_id.placeholder = "Weight (kg)"
+                        }
+                    },
+                    imperialHeight(){
+                        let ft = document.getElementById("height");
+                        let inches = document.createElement("INPUT");
+                        if (document.getElementById("height-switch").checked){
+
+                            ft.placeholder = "Height (ft)";
+
+                            inches.placeholder = "Inches";
+                            inches.min = 0;
+                            inches.setAttribute("type", "number");
+                            inches.setAttribute("id", "inches");
+                            inches.setAttribute("class", "input-group-text");
+                            inches.setAttribute("style", "width: 40%");
+
+                            document.getElementById("height-div").appendChild(inches);
+                        }
+                        else{
+                            this.reset(ft, "inches")
+                        }
+                    },
+
+                    imperialWeight(){
+                        let st = document.getElementById("weight");
+                        let lbs = document.createElement("INPUT");
+                        if (document.getElementById("weight-switch").checked){
+
+                            st.placeholder = "Weight (st)";
+
+                            lbs.placeholder = "Lbs";
+                            lbs.min = 0;
+                            lbs.setAttribute("type", "number");
+                            lbs.setAttribute("id", "lbs");
+                            lbs.setAttribute("class", "input-group-text");
+                            lbs.setAttribute("style", "width: 40%");
+
+                            document.getElementById("weight-div").appendChild(lbs);
+                        }
+                        else{
+                            this.reset(st, "lbs");
+                        }
+                    },
+                    submit(){
+                        if (document.getElementById("height-switch").checked){
+                            let feet = document.getElementById("height").value;
+                            let inches = document.getElementById("inches").value;
+                            let cm = Math.round(feet*30.48+inches*2.54);
+                            document.getElementById("inches").remove();
+                            document.getElementById("height").value = cm;
+                        }
+                        if(document.getElementById("weight-switch").checked){
+                            let st = document.getElementById("weight").value;
+                            let lbs = document.getElementById("lbs").value;
+                            let kg = Math.round(st*6.35029318+lbs*0.45359237);
+                            document.getElementById("lbs").remove();
+                            document.getElementById("weight").value = kg;
+                        }
+                        document.getElementById("username").value = document.getElementById("username").value.toLowerCase();
+                        document.getElementById("registration-form").submit();
+                    }
+                }
+            })
+            myApp.mount('#app')
+        </script>
+    {% endblock %}
+{% endblock %}

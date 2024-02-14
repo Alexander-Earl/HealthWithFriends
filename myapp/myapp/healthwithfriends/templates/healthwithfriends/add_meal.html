@@ -1,0 +1,219 @@
+{% extends 'healthwithfriends/base.html' %}
+{% block content %}
+    <div id="app">
+        <div class="container">
+            <div class="contentContainer">
+                {% csrf_token %}
+                <p id="instructions"><i>Enter the individual food/drink items along with the associated serving size (in grams or ml), then press 'Submit'</i>.</p>
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th scope="col">Item #</th>
+                        <th scope="col">Food/Drink Item</th>
+                        <th scope="col">Serving (g/ml)</th>
+                        <th scope="col">Calorific Value</th>
+                        <th scope="col">Delete</th>
+                    </tr>
+                    </thead>
+                    <tr v-for="(food_item, k) in food_items" :key="k">
+                        <td><b>[[k+1]]</b></td>
+                        <td>
+                            <input type="text" class="form-control" v-model="food_item.food_name" v-bind:id="'food_item'+k"/>
+                        </td>
+                        <td>
+                            <input type="number" min="0" class="form-control" v-model="food_item.food_serving" v-bind:id="'food_serving'+k"/>
+                        </td>
+                        <td>
+                            <input type="number" min="0" readonly class="form-control" v-model="food_item.calorific_value" v-bind:id="k" disabled/>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-danger" @click="deleteRow(k, food_item)" v-bind:id="'delete'+k" style="visibility: hidden;">Delete</button>
+                        </td>
+                    </tr>
+                </table>
+                <button type='button' class="btn btn-primary btn-sm mb-4" id="add_row" @click="addNewRow">Add Row</button>
+                <h4>Total Calories: [[ totalCalories ]]</h4>
+                <div v-for="u in user"><button @click="submitMeal(u)" class="btn btn-success" id="submit_button">Submit</button></div>
+            </div>
+        </div>
+    </div>
+    {% block scripts %}
+        <script>
+            let myApp = Vue.createApp({
+                delimiters: ["[[", "]]"],
+                data() {
+                    return {
+                        user: [],
+                        food_items: [{
+                            food_name: '',
+                            food_serving: 0,
+                            calorific_value: 0
+                        }],
+                        totalCalories: 0,
+                    }
+                },
+                async created() {
+                    let response = await fetch("{% url 'user api' %}");
+                    if (response.ok) {
+                        let data = await response.json();
+                        this.user = data.user;
+
+                    } else {
+                        alert("failed to load user");
+                    }
+                },
+
+                methods: {
+                    async getFood(food, serving) {
+                        let response = await fetch('https://api.calorieninjas.com/v1/nutrition?query=' + serving + "g " + food, {
+                            method: 'GET',
+                            headers: {
+                                'X-Api-Key': 'T+RHBO0bNlTK5tlMZuQ16w==Lx4nYmBTzVcAAEjZ',
+                            },
+                            contentType: 'application/json',
+                        });
+                        if (response.ok) {
+                            let info = await response.json();
+                            console.log(info);
+                            if (info.items.length == 0){
+                                return "ERROR";
+                            }
+                            return Math.round(info.items[0].calories);
+                        } else {
+                            return alert("failed to get food");
+                        }
+                    },
+
+                    async addNewRow() {
+                        if(this.food_items[this.food_items.length-1].food_name == ""){
+                            alert("Enter the name of the food/drink item.");
+                        }
+                        else if(this.food_items[this.food_items.length-1].food_serving == ""){
+                            alert("You must enter the serving size (g/ml) of the food/drink item.");
+                        }
+                        else{
+                            let add_row_button = document.getElementById("add_row");
+                            add_row_button.disabled = true;
+
+                            let position = this.food_items.length-1
+                            let food = document.getElementById("food_item"+(position).toString());
+                            let serving = document.getElementById("food_serving"+(position).toString());
+                            let delete_button = document.getElementById("delete"+(position).toString())
+
+                            food.disabled = true;
+                            serving.disabled = true;
+                            delete_button.style = "visibility: visible";
+
+                            let calories = await this.getFood(food.value,serving.value);
+                            if (calories == "ERROR"){
+                                if (confirm(food.value+" could not be found.\n\nIf you would like to re-enter the item presss 'OK'.\n\n"+
+                                    "If you insist that the item was entered correctly, select 'Cancel' and manually enter" +
+                                    " the associated calorific value."))
+                                {
+                                    food.disabled = false;
+                                    serving.disabled = false;
+                                    delete_button.style = "visibility: hidden";
+                                    add_row_button.disabled = false;
+                                }
+                                else{
+                                    document.getElementById(position.toString()).disabled = false;
+                                    let manually_entered = prompt("Please enter the assoicated calories");
+                                    if (manually_entered == null){
+                                        food.disabled = false;
+                                        food.value = "";
+
+                                        serving.disabled = false;
+                                        serving.value = "";
+
+                                        delete_button.style = "visibility: hidden";
+                                        add_row_button.disabled = false;
+                                    }
+                                    else{
+                                        this.food_items[position].calorific_value = manually_entered;
+                                        this.totalCalories = parseInt(manually_entered);
+                                        this.food_items.push({
+                                            food_name: '',
+                                            food_serving: 0,
+                                            calorific_value: 0
+                                        });
+                                    }
+                                }
+                            }
+                            else{
+                                this.food_items[position].calorific_value = calories;
+                                this.totalCalories += calories;
+                                this.food_items.push({
+                                    food_name: '',
+                                    food_serving: 0,
+                                    calorific_value: 0
+                                });
+                            }
+                        }
+                        document.getElementById("add_row").disabled = false;
+                    },
+
+                    deleteRow(index, food_item) {
+                        if(this.food_items.length == 1){
+                            alert("There must be at least 1 food item.")
+                        }
+                        else{
+                            let idx = this.food_items.indexOf(food_item);
+                            this.totalCalories -= this.food_items[idx].calorific_value;
+                            Math.round(this.totalCalories);
+                            if (idx > -1) {
+                                this.food_items.splice(idx, 1);
+                            }
+                            let position = this.food_items.length-1
+                            document.getElementById("food_item"+(position).toString()).disabled = false;
+                            document.getElementById("food_serving"+(position).toString()).disabled = false;
+                            document.getElementById("delete"+(position).toString()).style = "visibility: hidden";
+                        }
+                    },
+
+                    async submitMeal(u){
+                        if (this.food_items.length == 1){
+                            alert("No food items added.");
+                        }
+                        else{
+                            let calories = this.totalCalories;
+                            this.food_items.pop(); // removes last empty row.
+                            let response = await fetch(u.api, {
+                                method: 'POST_MEAL', // Method itself
+                                body: JSON.stringify({
+                                    food_items: JSON.stringify(this.food_items),
+                                    total_calories: calories,
+                                }), // We send data in JSON format
+                                headers: {
+                                    "Content-Type": "application/json",
+                                    "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value,
+                                    "Access-Control-Allow-Origin" : "*",
+                                    "Access-Control-Allow-Credentials" : true
+                                },
+                            });
+                            if(response.ok){
+                                alert("Meal Submitted.");
+                                location.reload();
+                            }
+                            else{
+                                alert("Failed to submit meal.");
+                            }
+                        }
+                    }
+                },
+            });
+            myApp.mount('#app');
+        </script>
+        <style>
+            #instructions {
+                text-align: center;
+            }
+            #add_row{
+                margin: 0 auto;
+                display: block;
+            }
+            #submit_button{
+                margin-top: 1em;
+            }
+        </style>
+    {% endblock %}
+{% endblock %}

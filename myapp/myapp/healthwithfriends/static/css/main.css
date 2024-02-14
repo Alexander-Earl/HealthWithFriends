@@ -1,0 +1,165 @@
+:root {
+    --bgColor: #222;
+    --bgGradient:  90deg, rgba(0,212,255,1) 0%, rgba(0,55,154,1) 100%;
+    --cardColor: rgba(255, 255, 255, 0.4);
+    --accentColor:  #015bff;
+    --accentColorLight:  #2b76ff;
+    --accentColorDark:  #003fb3;
+    --fontColorLight: #fff;
+    --fontColorDark: #000;
+    --iconColor: #fff;
+    --dropShadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+}
+
+html,
+body {
+    background: var(--bgColor);
+    background: -webkit-linear-gradient(var(--bgGradient));
+    background: linear-gradient(var(--bgGradient));
+    color: var(--fontColorLight);
+}
+
+.login-card-container {
+    width:  40rem;
+}
+
+.register-card-container {
+    width:  40rem;
+}
+
+.custom-card {
+    background: var(--cardColor);
+    border-radius: 1rem;
+    border: 0;
+    box-shadow: var(--dropShadow);
+    -webkit-box-shadow: var(--dropShadow);
+    -moz-box-shadow: var(--dropShadow);
+}
+
+.input-group-text {
+    background: var(--accentColor);
+    color: var(--iconColor) !important;
+    border: 0 !important;
+}
+
+.input-group-text .fas {
+    width:  1rem;
+}
+
+.form-control:focus {
+    box-shadow: none !important;
+    outline: 0px !important;
+}
+
+.form-check-input {
+    box-shadow: none !important;
+    border:  0;
+}
+
+.form-check-input:checked {
+    background-color: var(--accentColor) !important;
+}
+
+#registration-form .form-switch {
+    display: flex;
+    flex-direction: row-reverse;
+}
+
+#registration-form .form-switch label {
+    margin-right: 3em !important;
+}
+
+.btn:focus {
+    box-shadow: none !important;
+    outline: 0px !important;
+}
+
+.btn-primary {
+    background: var(--accentColor);
+    /*    background: -webkit-linear-gradient(var(--bgGradient));
+        background: linear-gradient(var(--bgGradient)); */
+    color: var(--fontColorLight) !important;
+    border:  0;
+}
+
+.btn-primary:hover {
+    background: var(--accentColorLight);
+    /*    background: -webkit-linear-gradient(var(--bgGradient));
+        background: linear-gradient(var(--bgGradient));*/
+}
+
+.login-btn-container {
+    padding: 0 4em;
+}
+
+.login-btn {
+    width: 100%;
+}
+
+.link-info {
+    color: var(--accentColor);
+}
+
+.link-info:hover {
+    color: var(--accentColorLight);
+}
+
+.nav-item .active {
+    background-color: var(--accentColor);
+}
+.nav-link {
+    height:  100%;
+}
+
+.nav-link:hover {
+    background-color: var(--accentColorLight);
+}
+
+#personal_info{
+    background-color: #6cb2de;
+    color: white;
+}
+
+#calories{
+    background-color: #e85c29;
+    color: white;
+}
+
+#recommended{
+    background-color: #0ca10c;
+}
+
+.contentContainer {
+    border-radius: 25px;
+    padding: 0.5em;
+    margin: 1em 1em 1em;
+    align-content: center;
+    text-align: center;
+    color: white;
+    background-color: var(--cardColor);
+    box-shadow: var(--dropShadow);
+    -webkit-box-shadow: var(--dropShadow);
+    -moz-box-shadow: var(--dropShadow);
+}
+
+.contentContainerFood{
+    border-radius: 25px;
+    padding: 0.5em;
+    margin: auto auto 1em;
+    align-content: center;
+    text-align: center;
+    color: black;
+    background-color: white;
+    box-shadow: var(--dropShadow);
+    -webkit-box-shadow: var(--dropShadow);
+    -moz-box-shadow: var(--dropShadow);
+}
+
+.contentContainerPrivacy {
+    border-radius: 25px;
+    padding: 0.5em;
+    background-color: var(--cardColor);
+    box-shadow: var(--dropShadow);
+    -webkit-box-shadow: var(--dropShadow);
+    -moz-box-shadow: var(--dropShadow);
+}

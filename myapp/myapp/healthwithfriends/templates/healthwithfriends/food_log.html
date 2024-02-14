@@ -1,0 +1,298 @@
+{% extends 'healthwithfriends/base.html' %}
+{% block content %}
+    <div id="app">
+        {% csrf_token %}
+        <div class="container">
+            <div class="contentContainer">
+                <h4>Choose a Week</h4>
+                <div class="d-flex justify-content-center align-items-center h-100">
+                    <div class="d-flex justify-content-center w-20 m-2">
+                        <div class="input-group">
+                            <input type="week" class="form-control" name="week" id="week" required>
+                            <button type="button" class="btn btn-primary" @click="getFood()"><i class="fa-solid fa-magnifying-glass"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="contentContainerFood" class="contentContainerFood" hidden>
+                <div class="d-flex justify-content-center align-items-center h-100">
+                    <div class="justify-content-center w-20 m-2">
+                        <div id="mon">
+                            <h3>Monday:</h3><br>
+                            <p v-if="monday.length == 0"><i>No meals entered for Monday.</i></p>
+                            <div v-for="(meal,k) in monday">
+                                <h5>Meal [[ k+1 ]]</h5>
+                                <table class="table border-dark table-hover" style="border: 1.25px solid black;">
+                                    <thead>
+                                    <tr style="background-color: deepskyblue">
+                                        <th scope="col">Food/Drink</th>
+                                        <th scope="col">Serving (g/ml)</th>
+                                        <th scope="col">Calories (kcal)</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody class="table-striped" v-for="(item, j) in JSON.parse(meal.food)">
+                                    <tr>
+                                        <td>[[ item.Food_Name ]]</td>
+                                        <td>[[ item.Food_Serving ]]</td>
+                                        <td>[[ item.Calorific_Value ]]</td>
+                                    </tr>
+                                    </tbody>
+                                    <tr class="table-primary">
+                                        <td colspan="3">Total Calories: <b>[[ meal.total_calories ]]</b></td>
+                                    </tr>
+                                    <tr class="table-success">
+                                        <td colspan="3">Date: <b>[[ new Date(Date.parse(meal.date)).toLocaleString([], {year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute:'2-digit'}) ]]</b></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div id="tue">
+                            <h3>Tuesday:</h3><br>
+                            <p v-if="tuesday.length == 0"><i>No meals entered for Tuesday.</i></p>
+                            <div v-for="(meal,k) in tuesday">
+                                <h5>Meal [[ k+1 ]]</h5>
+                                <table class="table border-dark table-hover" style="border: 1.25px solid black;">
+                                    <thead>
+                                    <tr style="background-color: deepskyblue">
+                                        <th scope="col">Food/Drink</th>
+                                        <th scope="col">Serving (g/ml)</th>
+                                        <th scope="col">Calories (kcal)</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody class="table-striped" v-for="(item, j) in JSON.parse(meal.food)">
+                                    <tr>
+                                        <td>[[ item.Food_Name ]]</td>
+                                        <td>[[ item.Food_Serving ]]</td>
+                                        <td>[[ item.Calorific_Value ]]</td>
+                                    </tr>
+                                    </tbody>
+                                    <tr class="table-primary">
+                                        <td colspan="3">Total Calories: <b>[[ meal.total_calories ]]</b></td>
+                                    </tr>
+                                    <tr class="table-success">
+                                        <td colspan="3">Date: <b>[[ new Date(Date.parse(meal.date)).toLocaleString([], {year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute:'2-digit'}) ]]</b></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div id="wed">
+                            <h3>Wednesday:</h3><br>
+                            <p v-if="wednesday.length == 0"><i>No meals entered for Wednesday.</i></p>
+                            <div v-for="(meal,k) in wednesday">
+                                <h5>Meal [[ k+1 ]]</h5>
+                                <table class="table border-dark table-hover" style="border: 1.25px solid black;">
+                                    <thead>
+                                    <tr style="background-color: deepskyblue">
+                                        <th scope="col">Food/Drink</th>
+                                        <th scope="col">Serving (g/ml)</th>
+                                        <th scope="col">Calories (kcal)</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody class="table-striped" v-for="(item, j) in JSON.parse(meal.food)">
+                                    <tr>
+                                        <td>[[ item.Food_Name ]]</td>
+                                        <td>[[ item.Food_Serving ]]</td>
+                                        <td>[[ item.Calorific_Value ]]</td>
+                                    </tr>
+                                    </tbody>
+                                    <tr class="table-primary">
+                                        <td colspan="3">Total Calories: <b>[[ meal.total_calories ]]</b></td>
+                                    </tr>
+                                    <tr class="table-success">
+                                        <td colspan="3">Date: <b>[[ new Date(Date.parse(meal.date)).toLocaleString([], {year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute:'2-digit'}) ]]</b></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div id="thur">
+                            <h3>Thursday:</h3><br>
+                            <p v-if="thursday.length == 0"><i>No meals entered for Thursday.</i></p>
+                            <div v-for="(meal,k) in thursday">
+                                <h5>Meal [[ k+1 ]]</h5>
+                                <table class="table border-dark table-hover" style="border: 1.25px solid black;">
+                                    <thead>
+                                    <tr style="background-color: deepskyblue">
+                                        <th scope="col">Food/Drink</th>
+                                        <th scope="col">Serving (g/ml)</th>
+                                        <th scope="col">Calories (kcal)</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody class="table-striped" v-for="(item, j) in JSON.parse(meal.food)">
+                                    <tr>
+                                        <td>[[ item.Food_Name ]]</td>
+                                        <td>[[ item.Food_Serving ]]</td>
+                                        <td>[[ item.Calorific_Value ]]</td>
+                                    </tr>
+                                    </tbody>
+                                    <tr class="table-primary">
+                                        <td colspan="3">Total Calories: <b>[[ meal.total_calories ]]</b></td>
+                                    </tr>
+                                    <tr class="table-success">
+                                        <td colspan="3">Date: <b>[[ new Date(Date.parse(meal.date)).toLocaleString([], {year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute:'2-digit'}) ]]</b></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div id="fri">
+                            <h3>Friday:</h3><br>
+                            <p v-if="friday.length == 0"><i>No meals entered for Friday.</i></p>
+                            <div v-for="(meal,k) in friday">
+                                <h5>Meal [[ k+1 ]]</h5>
+                                <table class="table border-dark table-hover" style="border: 1.25px solid black;">
+                                    <thead>
+                                    <tr style="background-color: deepskyblue">
+                                        <th scope="col">Food/Drink</th>
+                                        <th scope="col">Serving (g/ml)</th>
+                                        <th scope="col">Calories (kcal)</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody class="table-striped" v-for="(item, j) in JSON.parse(meal.food)">
+                                    <tr>
+                                        <td>[[ item.Food_Name ]]</td>
+                                        <td>[[ item.Food_Serving ]]</td>
+                                        <td>[[ item.Calorific_Value ]]</td>
+                                    </tr>
+                                    </tbody>
+                                    <tr class="table-primary">
+                                        <td colspan="3">Total Calories: <b>[[ meal.total_calories ]]</b></td>
+                                    </tr>
+                                    <tr class="table-success">
+                                        <td colspan="3">Date: <b>[[ new Date(Date.parse(meal.date)).toLocaleString([], {year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute:'2-digit'}) ]]</b></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div id="sat">
+                            <h3>Saturday:</h3><br>
+                            <p v-if="saturday.length == 0"><i>No meals entered for Saturday.</i></p>
+                            <div v-for="(meal,k) in saturday">
+                                <h5>Meal [[ k+1 ]]</h5>
+                                <table class="table border-dark table-hover" style="border: 1.25px solid black;">
+                                    <thead>
+                                    <tr style="background-color: deepskyblue">
+                                        <th scope="col">Food/Drink</th>
+                                        <th scope="col">Serving (g/ml)</th>
+                                        <th scope="col">Calories (kcal)</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody class="table-striped" v-for="(item, j) in JSON.parse(meal.food)">
+                                    <tr>
+                                        <td>[[ item.Food_Name ]]</td>
+                                        <td>[[ item.Food_Serving ]]</td>
+                                        <td>[[ item.Calorific_Value ]]</td>
+                                    </tr>
+                                    </tbody>
+                                    <tr class="table-primary">
+                                        <td colspan="3">Total Calories: <b>[[ meal.total_calories ]]</b></td>
+                                    </tr>
+                                    <tr class="table-success">
+                                        <td colspan="3">Date: <b>[[ new Date(Date.parse(meal.date)).toLocaleString([], {year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute:'2-digit'}) ]]</b></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div id="sun">
+                            <h3>Sunday:</h3><br>
+                            <p v-if="sunday.length == 0"><i>No meals entered for Sunday.</i></p>
+                            <div v-else v-for="(meal,k) in sunday">
+                                <h5>Meal [[ k+1 ]]</h5>
+                                <table class="table border-dark table-hover" style="border: 1.25px solid black;">
+                                    <thead>
+                                    <tr style="background-color: deepskyblue">
+                                        <th scope="col">Food/Drink</th>
+                                        <th scope="col">Serving (g/ml)</th>
+                                        <th scope="col">Calories (kcal)</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody class="table-striped" v-for="(item, j) in JSON.parse(meal.food)">
+                                    <tr>
+                                        <td>[[ item.Food_Name ]]</td>
+                                        <td>[[ item.Food_Serving ]]</td>
+                                        <td>[[ item.Calorific_Value ]]</td>
+                                    </tr>
+                                    </tbody>
+                                    <tr class="table-primary">
+                                        <td colspan="3">Total Calories: <b>[[ meal.total_calories ]]</b></td>
+                                    </tr>
+                                    <tr class="table-success">
+                                        <td colspan="3">Date: <b>[[ new Date(Date.parse(meal.date)).toLocaleString([], {year: 'numeric', month: 'numeric', day: 'numeric', hour: '2-digit', minute:'2-digit'}) ]]</b></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        <br>
+                        <div v-for="w in week">
+                            <button class="btn btn-primary"><a v-bind:href="'tracker/'+ w +'/meal' " style="text-decoration: none; color: white;">View Calorie Tracker</a></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% block scripts %}
+        <script>
+            let myApp = Vue.createApp({
+                delimiters: ["[[", "]]"],
+                data() {
+                    return {
+                        monday: [],
+                        tuesday: [],
+                        wednesday: [],
+                        thursday: [],
+                        friday: [],
+                        saturday: [],
+                        sunday: [],
+                        food: null,
+                        week: []
+                    }
+                },
+                async created(){
+                },
+                methods: {
+                    async getFood(){
+                        this.week = [];
+                        let week = document.getElementById("week").value;
+                        if (week == ""){
+                            alert("Please select a week from the calendar.")
+                        }
+                        else{
+                            this.week.push(week);
+                            let response = await fetch("{% url 'get food' %}", {
+                                method: 'POST', // Method itself
+                                headers: {
+                                    "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value,
+                                    "Content-Type": "application/json",
+                                },
+                                body: JSON.stringify({
+                                    'week': week,
+                                }),
+                            });
+                            if (response.ok) {
+                                let data = await response.json();
+                                this.monday = data.monday;
+                                this.tuesday = data.tuesday;
+                                this.wednesday = data.wednesday;
+                                this.thursday = data.thursday;
+                                this.friday = data.friday;
+                                this.saturday = data.saturday;
+                                this.sunday = data.sunday;
+
+                                document.getElementById("contentContainerFood").hidden = false;
+
+                            } else {
+                                alert("failed to load meals");
+                            }
+                        }
+                    }
+                }
+            })
+            myApp.mount('#app')
+        </script>
+    {% endblock %}
+{% endblock %}
